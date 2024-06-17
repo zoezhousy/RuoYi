@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysOrderMapper">
+    <resultMap type="com.ruoyi.system.domain.SysOrder" id="SysOrderResult">
+        <id     property="orderId"          column="order_id"       />
+        <result property="orderType"        column="order_type"     />
+        <result property="orderContent"     column="order_content"  />
+        <result property="orderStatus"      column="status"         />
+        <result property="company"          column="company"        />
+        <result property="createBy"         column="create_by"      />
+        <result property="createTime"       column="create_time"    />
+        <result property="updateBy"         column="update_by"      />
+        <result property="updateTime"       column="update_time"    />
+        <result property="remark"           column="remark"         />
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select order_id, order_type, order_content, status, company, create_by, create_time, update_by, update_time, remark
+        from sys_order
+    </sql>
+
+    <!-- 插入新订单 -->
+    <insert id="insertOrder" parameterType="com.ruoyi.system.domain.SysOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into sys_order (
+        <if test="orderType != null and orderType != '' ">order_type, </if>
+        <if test="orderContent != null and orderContent != '' ">order_content, </if>
+        <if test="orderStatus != null and orderStatus != '' ">status, </if>
+        <if test="company != null and company != '' ">company, </if>
+        <if test="remark != null and remark != '' ">remark,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )
+        values (
+        <if test="orderType != null and orderType!= '' "> #{orderType},</if>
+        <if test="orderContent != null and orderContent!= '' "> #{orderContent},</if>
+        <if test="orderStatus != null and orderStatus!= '' "> #{orderStatus},</if>
+        <if test="company != null and company!= '' "> #{company},</if>
+        <if test="remark != null and remark!= '' "> #{remark},</if>
+        <if test="createBy != null and createBy != ''"> #{createBy},</if>
+        NOW()
+        )
+    </insert>
+
+    <!-- 更新订单状态 -->
+    <update id="updateOrder" parameterType="com.ruoyi.system.domain.SysOrder">
+        update sys_order
+<!--        SET orderStatus = #{status} -->
+        <set>
+            <if test="orderType != null and orderType!= '' ">order_type = #{orderType},</if>
+            <if test="orderContent != null and orderContent!= '' ">order_content = #{orderContent},</if>
+            <if test="orderStatus != null and orderStatus!= '' ">status = #{orderStatus},</if>
+            <if test="company != null and company!= '' ">company = #{company},</if>
+            <if test="remark != null and remark!= '' ">remark = #{remark},</if>
+            update_by = #{updateBy},
+            update_time = sysdate()
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+    <!-- 根据ID查询订单 -->
+    <select id="selectOrderById" parameterType="Long" resultMap="SysOrderResult" >
+        <include refid="selectOrderVo"/>
+        <where>
+            order_id = #{orderId} limit 1
+        </where>
+    </select>
+
+    <!-- 查询订单列表 -->
+    <select id="selectOrderList" resultMap="SysOrderResult" parameterType="com.ruoyi.system.domain.SysOrder">
+        <include refid="selectOrderVo"/>
+        <where>
+            <if test="company != null and company != '' ">
+                AND company like concat('%', #{company}, '%')
+            </if>
+            <if test="orderContent != null and orderContent != '' ">
+                AND order_content like concat('%', #{orderContent},'%')
+            </if>
+            <if test="createBy != null and createBy != '' ">
+                AND create_by like concat('%', #{createBy},'%')
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                AND status = #{orderStatus}
+            </if>
+            <if test="orderType != null and orderType != ''">
+                AND order_type = #{orderType}
+            </if>
+            <if test="startTime != null and startTime != ''"><!-- 开始时间 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{startTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <!-- 选择所有订单 -->
+    <select id="selectOrderAll" resultMap="SysOrderResult">
+        <include refid="selectOrderVo"/>
+    </select>
+
+    <!-- 删除订单 -->
+    <delete id="deleteOrderByIds" parameterType="String">
+        DELETE FROM sys_order WHERE order_id IN
+        <foreach collection="array" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+</mapper>

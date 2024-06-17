@@ -18,7 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<sql id="selectPostVo">
-        select post_id, post_code, post_name, post_sort, status, create_by, create_time, remark 
+        select post_id, post_code, post_name, post_sort, status, create_by, create_time, update_by, update_time, remark
 		from sys_post
     </sql>
 	
@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<select id="selectPostsByUserId" parameterType="Long" resultMap="SysPostResult">
 		SELECT p.post_id, p.post_name, p.post_code
-		FROM sys_user u
+		FROM sys_user
 			 LEFT JOIN sys_user_post up ON u.user_id = up.user_id
 			 LEFT JOIN sys_post p ON up.post_id = p.post_id
 		WHERE up.user_id = #{userId}
