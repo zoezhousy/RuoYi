@@ -255,6 +255,8 @@ insert into sys_menu values('1059', '生成删除', '115', '3',  '#', '',  'F', 
 insert into sys_menu values('1060', '预览代码', '115', '4',  '#', '',  'F', '0', '1', 'tool:gen:preview',  '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1061', '生成代码', '115', '5',  '#', '',  'F', '0', '1', 'tool:gen:code',     '#', 'admin', sysdate(), '', null, '');
 
+insert into sys_menu values('2000', '订单管理', '1', '1', '/system/order/view', 'menuItem', 'C', '0', '1', NULL, '#', 'admin', sysdate(), '', NULL, '');
+insert into sys_menu values('2001', '查看商品', '1', '1', '/system/product/view', 'menuItem', 'C', '0', '1', NULL, '#', 'admin', sysdate(), '', NULL, '');
 
 -- ----------------------------
 -- 6、用户和角色关联表  用户N-1角色
@@ -465,7 +467,10 @@ insert into sys_dict_type values(7,  '通知类型', 'sys_notice_type',     '0',
 insert into sys_dict_type values(8,  '通知状态', 'sys_notice_status',   '0', 'admin', sysdate(), '', null, '通知状态列表');
 insert into sys_dict_type values(9,  '操作类型', 'sys_oper_type',       '0', 'admin', sysdate(), '', null, '操作类型列表');
 insert into sys_dict_type values(10, '系统状态', 'sys_common_status',   '0', 'admin', sysdate(), '', null, '登录状态列表');
-
+insert into sys_dict_type values(11, '订单状态', 'sys_order_status',    '0', 'admin', sysdate(), '', null, '订单状态列表');
+insert into sys_dict_type values(12, '订单类型', 'sys_order_type',      '0', 'admin', sysdate(), '', null, '订单类型列表');
+insert into sys_dict_type values(13, '商品状态', 'sys_product_status',  '0', 'admin', sysdate(), '', null, '商品状态列表');
+insert into sys_dict_type values(14, '商品类型', 'sys_product_type',    '0', 'admin', sysdate(), '', null, '商品类型列表');
 
 -- ----------------------------
 -- 12、字典数据表
@@ -519,6 +524,18 @@ insert into sys_dict_data values(26, 8,  '生成代码', '8',       'sys_oper_ty
 insert into sys_dict_data values(27, 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '清空操作');
 insert into sys_dict_data values(28, 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', '0', 'admin', sysdate(), '', null, '正常状态');
 insert into sys_dict_data values(29, 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '停用状态');
+insert into sys_dict_data values(30, 1,  '正常',     '0',       'sys_order_status',   '',   'primary',  'N', '0', 'admin', sysdate(), '', null, '正常状态');
+insert into sys_dict_data values(31, 2,  '取消',     '1',       'sys_order_status',   '',   'warning',  'N', '0', 'admin', sysdate(), '', null, '取消状态');
+insert into sys_dict_data values(32, 3,  '完成',     '2',       'sys_order_status',   '',   'success',  'N', '0', 'admin', sysdate(), '', null, '完成状态');
+insert into sys_dict_data values(33, 1,  '普通',     '0',       'sys_order_type',   '',   'primary',  'N', '0', 'admin', sysdate(), '', null, '普通类型');
+insert into sys_dict_data values(34, 2,  '紧急',     '1',       'sys_order_type',   '',   'warning',  'N', '0', 'admin', sysdate(), '', null, '紧急类型');
+insert into sys_dict_data values(35, 3,  '逾期',     '2',       'sys_order_type',   '',   'danger',   'N', '0', 'admin', sysdate(), '', null, '逾期类型');
+insert into sys_dict_data values(36, 1,  '小说',     '0',       'sys_product_type',   '',   'primary',  'N', '0', 'admin', sysdate(), '', null, '小说');
+insert into sys_dict_data values(37, 2,  '散文',     '1',       'sys_product_type',   '',   'warning',  'N', '0', 'admin', sysdate(), '', null, '散文');
+insert into sys_dict_data values(38, 3,  '诗歌',     '2',       'sys_product_type',   '',   'success',  'N', '0', 'admin', sysdate(), '', null, '诗歌');
+insert into sys_dict_data values(39, 1,  '正常',     '0',       'sys_product_status',   '',   'primary',  'N', '0', 'admin', sysdate(), '', null, '正常');
+insert into sys_dict_data values(40, 2,  '停用',     '1',       'sys_product_status',   '',   'warning',  'N', '0', 'admin', sysdate(), '', null, '停用');
+
 
 
 -- ----------------------------
@@ -720,3 +737,70 @@ create table gen_table_column (
   update_time       datetime                                   comment '更新时间',
   primary key (column_id)
 ) engine=innodb auto_increment=1 comment = '代码生成业务表字段';
+
+-- ----------------------------
+-- 21、订单信息表
+-- ----------------------------
+drop table if exists sys_order;
+create table sys_order (
+    order_id        bigint(20)      not null auto_increment     comment '编号',
+    order_type      char(1)         not null                    comment '订单类型（0普通 1紧急 2逾期）',
+    order_content   varchar(500)    not null                    comment '订单内容',
+    order_status    char(1)         default '0'                 comment '订单状态（0正常 1取消 2 完成）',
+    company         varchar(500)                                comment '订单客户',
+    create_by       varchar(64)     default ''                  comment '创建者',
+    create_time 	datetime        not null                    comment '创建时间',
+    update_by       varchar(64)     default ''                  comment '更新者',
+    update_time     datetime                                    comment '更新时间',
+    remark          varchar(500)                                comment '备注',
+    primary key (order_id)
+) engine=innodb auto_increment = 1 comment = '订单表';
+
+INSERT INTO sys_order (order_type, order_content, order_status, company, create_by, create_time) VALUES
+('0', '普通订单', '0', '公司1','admin', NOW()-1);
+INSERT INTO sys_order (order_type, order_content, order_status, company,create_by, create_time) VALUES
+('1', '紧急订单', '0', '公司1','manager', NOW());
+INSERT INTO sys_order (order_type, order_content, order_status, company, create_by, create_time, update_by, update_time) VALUES
+('2', '逾期订单', '1', '公司2','user1', 20240606080808, 'user1', NOW());
+INSERT INTO sys_order (order_type, order_content, order_status, company,create_by, create_time) VALUES
+('0', '普通订单2', '0', '公司3','user2', NOW());
+
+-- ----------------------------
+-- 22、商品信息表
+-- ----------------------------
+drop table if exists sys_product;
+create table sys_product (
+    product_id      bigint(20)      not null auto_increment     comment '编号',
+    product_name    varchar(255)    not null                    comment '商品名称',
+    product_price   decimal(10,2)   not null                    comment '商品价格',
+    product_type    char(1)         default '0'                 comment '商品分类（0小说 1散文 2诗歌）',
+    product_status  char(1)         default '0'                 comment '商品状态（0正常 1停用）',
+    author          varchar(100)                                comment '作者',
+    publish_date    datetime                                    comment '出版时间',
+    publisher       varchar(100)                                comment '出版社',
+    remark          varchar(500)                                comment '备注',
+    primary key (product_id)
+) engine=innodb auto_increment = 1 comment ='商品信息表';
+
+-- insert csv into database
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\books.csv'
+INTO TABLE sys_product
+FIELDS TERMINATED BY ','ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS 
+(product_name, product_price, @dummy, author, publish_date, publisher);
+
+
+-- ----------------------------
+-- 23、客户信息表
+-- ----------------------------
+drop table if exists sys_customer;
+create table sys_customer(
+    customer_id         bigint(20)      not null auto_increment     comment '客户编号',
+    customer_name       varchar(255)    not null                    comment '客户名字',
+    customer_email      varchar(50)     default '' unique           comment '客户邮箱',
+    customer_status     varchar(1)      default '0'                 comment '客户状态（0正常 1停用）',
+    account_balance     decimal(10, 2)  default 0.00                comment '客户账户余额',
+    primary key (customer_id)
+) engine=innodb auto_increment = 1 comment ='客户信息表';
+

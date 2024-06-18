@@ -8,16 +8,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.domain.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * 岗位表 sys_post
@@ -27,7 +20,7 @@ import java.util.Map;
 
 @Data
 @TableName("sys_order")
-public class SysOrder extends BaseEntity
+public class SysOrder
 {
     @TableId(value ="order_id",type = IdType.AUTO)
     private Long orderId;
@@ -61,7 +54,10 @@ public class SysOrder extends BaseEntity
     @TableField("remark")
     private String remark;
 
+    @TableField(exist = false)
     private String startTime;
+
+    @TableField(exist = false)
     private String endTime;
 
 }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysProductMapper">
+    <resultMap type="com.ruoyi.system.domain.SysProduct" id="SysProductResult">
+        <id     property="productId"            column="product_id"       />
+        <result property="productName"          column="product_name"     />
+        <result property="productPrice"         column="product_price"  />
+        <result property="productType"          column="product_type"         />
+        <result property="productStatus"        column="product_status"        />
+        <result property="author"               column="author"      />
+        <result property="publishDate"          column="publish_date"    />
+        <result property="publisher"            column="publisher"      />
+        <result property="remark"               column="remark"         />
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select product_id, product_name, product_price, product_type, product_status, author, publish_date, publisher, remark
+        from sys_product
+    </sql>
+
+    <!-- 插入新订单 -->
+    <insert id="insertProduct" parameterType="com.ruoyi.system.domain.SysProduct" useGeneratedKeys="true" keyProperty="productId">
+        insert into sys_product (
+        <if test="productName != null and productName != '' "> product_name, </if>
+        <if test="productContent != null and productContent != '' ">product_content, </if>
+        <if test="productPrice != null and productPrice != '' ">product_price, </if>
+        <if test="productType != null and productType != '' ">productType, </if>
+        <if test="productStatus != null and productStatus != '' ">productStatus, </if>
+        <if test="author != null and author != '' ">author, </if>
+        <if test="publishDate != null and publishDate != '' ">publish_date, </if>
+        <if test="publisher != null and publisher != '' ">publisher, </if>
+        <if test="remark != null and remark != '' ">remark,</if>
+
+        )
+        values (
+        <if test="productName != null and productName != '' "> #{productName}, </if>
+        <if test="productContent != null and productContent != '' ">#{productContent}, </if>
+        <if test="productPrice != null and productPrice != '' ">#{productPrice}, </if>
+        <if test="productType != null and productType != '' ">#{productType}, </if>
+        <if test="productStatus != null and productStatus != '' ">#{productStatus}, </if>
+        <if test="author != null and author != '' ">#{author}, </if>
+        <if test="publishDate != null and publishDate != '' ">#{publishDate}, </if>
+        <if test="publisher != null and publisher != '' ">#{publisher}, </if>
+        <if test="remark != null and remark != '' ">#{remark},</if>
+        )
+    </insert>
+
+    <!-- 更新订单状态 -->
+    <update id="updateProduct" parameterType="com.ruoyi.system.domain.SysProduct">
+        update sys_product
+        <set>
+            <if test="orderType != null and orderType!= '' ">order_type = #{orderType},</if>
+            <if test="orderContent != null and orderContent!= '' ">order_content = #{orderContent},</if>
+            <if test="orderStatus != null and orderStatus!= '' ">status = #{orderStatus},</if>
+            <if test="company != null and company!= '' ">company = #{company},</if>
+            <if test="remark != null and remark!= '' ">remark = #{remark},</if>
+            update_by = #{updateBy},
+            update_time = sysdate()
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+    <!-- 根据ID查询订单 -->
+    <select id="selectProductById" parameterType="Long" resultMap="SysProductResult" >
+        <include refid="selectProductVo"/>
+        <where>
+            product_id = #{productId} limit 1
+        </where>
+    </select>
+
+    <!-- 查询订单列表 -->
+    <select id="selectProductList" resultMap="SysProductResult" parameterType="com.ruoyi.system.domain.SysProduct">
+        <include refid="selectProductVo"/>
+<!--        <where>-->
+<!--            <if test="company != null and company != '' ">-->
+<!--                AND company like concat('%', #{company}, '%')-->
+<!--            </if>-->
+<!--            <if test="orderContent != null and orderContent != '' ">-->
+<!--                AND order_content like concat('%', #{orderContent},'%')-->
+<!--            </if>-->
+<!--            <if test="createBy != null and createBy != '' ">-->
+<!--                AND create_by like concat('%', #{createBy},'%')-->
+<!--            </if>-->
+<!--            <if test="orderStatus != null and orderStatus != ''">-->
+<!--                AND order_status = #{orderStatus}-->
+<!--            </if>-->
+<!--            <if test="orderType != null and orderType != ''">-->
+<!--                AND order_type = #{orderType}-->
+<!--            </if>-->
+<!--            <if test="startTime != null and startTime != ''">&lt;!&ndash; 开始时间 &ndash;&gt;-->
+<!--                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{startTime},'%y%m%d')-->
+<!--            </if>-->
+<!--            <if test="endTime != null and endTime != ''">&lt;!&ndash; 结束时间 &ndash;&gt;-->
+<!--                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')-->
+<!--            </if>-->
+<!--        </where>-->
+    </select>
+
+    <!-- 选择所有订单 -->
+    <select id="selectProductAll" resultMap="SysProductResult">
+        <include refid="selectProductVo"/>
+    </select>
+
+    <!-- 删除订单 -->
+    <delete id="deleteProductByIds" parameterType="String">
+        DELETE FROM sys_product WHERE product_id IN
+        <foreach collection="array" item="productId" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -7,7 +7,7 @@
         <id     property="orderId"          column="order_id"       />
         <result property="orderType"        column="order_type"     />
         <result property="orderContent"     column="order_content"  />
-        <result property="orderStatus"      column="status"         />
+        <result property="orderStatus"      column="order_status"         />
         <result property="company"          column="company"        />
         <result property="createBy"         column="create_by"      />
         <result property="createTime"       column="create_time"    />
@@ -17,7 +17,7 @@
     </resultMap>
 
     <sql id="selectOrderVo">
-        select order_id, order_type, order_content, status, company, create_by, create_time, update_by, update_time, remark
+        select order_id, order_type, order_content, order_status, company, create_by, create_time, update_by, update_time, remark
         from sys_order
     </sql>
 
@@ -26,7 +26,7 @@
         insert into sys_order (
         <if test="orderType != null and orderType != '' ">order_type, </if>
         <if test="orderContent != null and orderContent != '' ">order_content, </if>
-        <if test="orderStatus != null and orderStatus != '' ">status, </if>
+        <if test="orderStatus != null and orderStatus != '' ">order_status, </if>
         <if test="company != null and company != '' ">company, </if>
         <if test="remark != null and remark != '' ">remark,</if>
         <if test="createBy != null and createBy != ''">create_by,</if>
@@ -81,7 +81,7 @@
                 AND create_by like concat('%', #{createBy},'%')
             </if>
             <if test="orderStatus != null and orderStatus != ''">
-                AND status = #{orderStatus}
+                AND order_status = #{orderStatus}
             </if>
             <if test="orderType != null and orderType != ''">
                 AND order_type = #{orderType}
